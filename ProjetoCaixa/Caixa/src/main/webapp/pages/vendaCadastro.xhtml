@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<ui:composition template="/templates/geral.xhtml">
+
+	<ui:define name="metadata">
+
+		<f:metadata>
+
+			<f:event listener="#{vendaBean.listarProdutos}" type="preRenderView" />
+
+		</f:metadata>
+
+	</ui:define>
+
+	<ui:define name="conteudo">
+
+		<h:form id="FormVenda">
+
+			<p:toolbar>
+
+				<f:facet name="left">
+
+					<h:outputText value="Vendas" />
+
+				</f:facet>
+
+			</p:toolbar>
+
+			<p:dataTable emptyMessage="Nenhum Registro encontrado"
+				value="#{vendaBean.listaProdutos}" var="produto" rows="3"
+				paginator="true">
+
+				<p:column headerText="Codigo">
+
+					<h:outputText value="#{produto.codigo}" />
+
+				</p:column>
+
+				<p:column headerText="Descricao">
+
+					<h:outputText value="#{produto.descricao}" />
+
+				</p:column>
+
+				<p:column headerText="Preco">
+
+					<h:outputText value="#{produto.preco}" />
+
+				</p:column>
+
+				<p:column headerText="Quantidade">
+
+					<h:outputText value="#{produto.quantidade}" />
+
+				</p:column>
+
+				<p:column headerText="Fabricante">
+
+					<h:outputText value="#{produto.fabricante.descricao}" />
+
+				</p:column>
+
+
+				<p:column headerText="Opcoes" style="width:20%;">
+
+					<p:commandButton value="Adicionar"
+						actionListener="#{vendaBean.adicionar(produto)}"
+						update=":FormVenda:tblItens :FormVenda:valorTotal" />
+
+				</p:column>
+
+			</p:dataTable>
+
+			<p:dataTable emptyMessage="Nenhum Registro encontrado"
+				value="#{vendaBean.listaItens}" var="item" rows="3" paginator="true"
+				id="tblItens">
+
+				<p:column headerText="Produto">
+
+					<h:outputText value="#{item.produto.descricao}" />
+
+				</p:column>
+
+				<p:column headerText="Fabricante">
+
+					<h:outputText value="#{item.produto.fabricante.descricao}" />
+
+				</p:column>
+
+
+				<p:column headerText="Quantidade">
+
+					<h:outputText value="#{item.quantidade}" />
+
+				</p:column>
+
+				<p:column headerText="Valor Parcial">
+
+					<h:outputText value="#{item.valor}" />
+
+				</p:column>
+
+				<p:column headerText="Opcoes" style="width:20%;">
+
+					<p:commandButton value="Remover"
+						action="#{vendaBean.remover(item)}"
+						update=":FormVenda:tblItens :FormVenda:valorTotal" />
+
+				</p:column>
+
+			</p:dataTable>
+			
+			<h:panelGrid columns="1">
+			
+				<h:outputText id="valorTotal"
+				value="Valor total #{vendaBean.venda.valor}" />
+				
+				<p:commandButton value="Finalizar Venda" oncomplete="PF('fimVenda').show();"
+				actionListener="#{vendaBean.carregarDadosVenda}"
+				update=":formFimVenda:fimVendaDados"/>
+				
+			
+			</h:panelGrid>
+
+			
+		</h:form>
+
+		<p:dialog modal="true" draggable="true" resizable="false"
+			closable="true" header="Finalizacao da venda"
+			widgetVar="fimVenda" appendTo="@(body)">
+			
+			<h:form id="formFimVenda">
+			
+				<h:panelGrid id="fimVendaDados">
+				
+					<h:outputText value="Horario" />
+					
+					<h:outputText value="#{vendaBean.venda.horario}" >
+					
+						<f:convertDateTime pattern="dd/MM/yyyy HH:mm"
+						timeZone="America/Sao_Paulo"/>
+					
+					</h:outputText>
+										
+					<h:outputText value="Funcionario" />
+					
+					<h:outputText value="#{vendaBean.venda.funcionario.nome}" />
+					
+					<h:outputText value="Valor Total" />
+					
+					<h:outputText value="#{vendaBean.venda.valor}" />
+				
+				</h:panelGrid>
+				
+				<h:panelGrid columns="2">
+				
+					<p:commandButton value="Finalizar venda"
+					actionListener="#{vendaBean.salvar}" 
+					update=":msgGlobal :FormVenda:tblItens :FormVenda:valorTotal"
+					oncomplete="PF('fimVenda')hide();"/>
+					
+					<p:commandButton value="Voltar" onclick="PF('fimVenda')hide();"/>
+				
+				
+				</h:panelGrid>
+			
+			</h:form>
+
+		</p:dialog>
+
+	</ui:define>
+
+</ui:composition>
+
+</html>
